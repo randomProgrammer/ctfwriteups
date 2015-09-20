@@ -257,6 +257,7 @@ Another match!
 
 compile the code, run it.
 
+<pre><code>
 >> Part1: Enter flag:
 flag
 
