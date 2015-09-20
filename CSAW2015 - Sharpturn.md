@@ -1,7 +1,7 @@
-=Sharpturn=
+#Sharpturn#
 
-==I think my SATA controller is dying.==
-===HINT: git fsck -v===
+##I think my SATA controller is dying.##
+###HINT: git fsck -v###
 
 We are given a git repo, clone it and run git fsck -v.
 
@@ -273,7 +273,7 @@ Part5: Input the two prime factors of the number 272031727027.
 31357
 8675311
 
-===>> flag{some hash here i didn't save}===
+###>> flag{some hash here i didn't save}###
 
 
 
