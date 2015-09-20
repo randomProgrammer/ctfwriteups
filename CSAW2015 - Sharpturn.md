@@ -5,7 +5,7 @@
 
 We are given a git repo, clone it and run git fsck -v.
 
-<code>
+<pre><code>
 Output:
 Checking tree 2bd4c81f7261a60ecded9bae3027a46b9746fa4f
 Checking commit 2e5d553f41522fc9036bacce1398c87c2483c2d5
@@ -23,11 +23,11 @@ Checking blob e5e5f63b462ec6012bc69dfa076fa7d92510f22f
 Checking blob efda2f556de36b9e9e1d62417c5f282d8961e2f8
 error: sha1 mismatch f8d0839dd728cb9a723e32058dcc386070d5e3b5
 error: f8d0839dd728cb9a723e32058dcc386070d5e3b5: object corrupt or missing
-</code>
+</code></pre>
 
 Hmm... 3 file corruption errors. Starting from the first:
 
-<code>
+<pre><code>
 $ git cat-file -p 354ebf392533dce06174f9c8c093036c138935f3
 
 #include <iostream>
@@ -58,35 +58,35 @@ int main(int argc, char **argv)
 
         return 0;
 }
-</code>
+</code></pre>
 
 Okay, so we know his SATA controller is having problems, and the file is corrupt. Presumably there's some kind of bit flip here?
 git checkout 2e5d --force (This commit is specified in fsck -v as the one where the corrupt file is).
 
-<code>
+<pre><code>
 $ git hash-object sharp.cpp
 > 8675cb049bbc546dee3233d4ada488f47b1f1ed3
 Yep, definitely wrong! We're looking for 354ebf392533dce06174f9c8c093036c138935f3
-</code>
+</code></pre>
 
 edit sharp.cpp 51337->31337
 
-<code>
+<pre><code>
 $ git hash-object sharp.cpp
 354ebf392533dce06174f9c8c093036c138935f3
-</code>
+</code></pre>
 
 Bingo!
 
 That's one down. Two to go.
 
-<code>
+<pre><code>
 $ git cat-file -p d961f81a588fcfd5e57bbea7e17ddae8a5e61333
-</code>
+</code></pre>
 
 outputs a modified sharp.cpp
 
-<code>
+<pre><code>
 $ git diff 2e5d d57a
 +       uint64_t first, second;
 +       cout << "Part5: Input the two prime factors of the number 270031727027." << endl;
@@ -105,24 +105,24 @@ $ git diff 2e5d d57a
 +               factor2 = first;
 +       }
 +
-</code>
+</code></pre>
 
 Check the prime factors of 270031727027 with wolfram alpha -> 29×271×1103×31151
 Four...
 
-<code>
+<pre><code>
 $git log
 commit d57aaf773b1a8c8e79b6e515d3f92fc5cb332860
 Author: sharpturn <csaw@isis.poly.edu>
 Date:   Sat Sep 5 18:09:31 2015 -0700
 
     There's only two factors. Don't let your calculator lie.
-</code>
+</code></pre>
 	
 Okay, so this number is corrupted - should have only two factors.
 I wrote a python script to flip a bit in the string "270031727027", check if it was a number and had two prime factors, and print the results. Hopefully there's only one!
 
-<code>
+<pre><code>
 230031727027 [79, 2911794013L]
 272031727027 [31357, 8675311L]
 270231727027 [181, 1492992967L]
@@ -132,29 +132,29 @@ I wrote a python script to flip a bit in the string "270031727027", check if it 
 270031727827 [157, 1719947311L]
 270031727127 [3, 90010575709L]
 270031727067 [3, 90010575689L]
-</code>
+</code></pre>
 
 Not one, but not too many. Switch em in for the original, check the hash!
-<code>
+<pre><code>
 $ git hash-object sharp.cpp
 42a825de0209c287c039b52370ac690a40d838c1
-</code>
+</code></pre>
 
 Number two on the list (272031727027) does the job!
 
-<code>
+<pre><code>
 $ git hash-object sharp.cpp
 d961f81a588fcfd5e57bbea7e17ddae8a5e61333
-</code>
+</code></pre>
 
 Last one.
 
-<code>
+<pre><code>
 $ git cat-file -p f8d0839dd728cb9a723e32058dcc386070d5e3b5
-</code>
+</code></pre>
 sharp.cpp again
 
-<code>
+<pre><code>
 $ git diff d57a master
 
 diff --git a/Makefile b/Makefile
@@ -241,17 +241,17 @@ index d961f81..f8d0839 100644
 +       cout << "}" << endl;
 +
         return 0;
-</code>
+</code></pre>
 		
 Okay so added a Makefile, rounded out the flag generation code... which bit could be off? 
 
 Notice the flag printing code: "cout << &lag;"
 Doesn't look right! Try "cout << flag;".
 
-<code>
+<pre><code>
 $ git hash-object sharp.cpp
 f8d0839dd728cb9a723e32058dcc386070d5e3b5
-</code>
+</code></pre>
 
 Another match!
 
