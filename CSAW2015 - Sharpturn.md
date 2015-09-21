@@ -61,7 +61,12 @@ int main(int argc, char **argv)
 </code></pre>
 
 Okay, so we know his SATA controller is having problems, and the file is corrupt. Presumably there's some kind of bit flip here?
-git checkout 2e5d --force (This commit is specified in fsck -v as the one where the corrupt file is).
+
+<pre><code>
+git checkout 2e5d --force
+</code></pre>
+
+(This commit is specified in fsck -v as the one where the corrupt file is).
 
 <pre><code>
 $ git hash-object sharp.cpp
@@ -79,6 +84,14 @@ $ git hash-object sharp.cpp
 Bingo!
 
 That's one down. Two to go.
+
+Let's checkout the next dodgy commit! (Again from fsck -v output)
+
+<pre><code>
+git checkout d57a --force
+</code></pre>
+
+And lets see what the corrupt file looks like...
 
 <pre><code>
 $ git cat-file -p d961f81a588fcfd5e57bbea7e17ddae8a5e61333
@@ -108,7 +121,8 @@ $ git diff 2e5d d57a
 </code></pre>
 
 Check the prime factors of 270031727027 with wolfram alpha -> 29×271×1103×31151
-Four...
+Four... that's weird. We're looking for two, right?
+OWe can see the commit messages using git log:
 
 <pre><code>
 $git log
@@ -119,7 +133,7 @@ Date:   Sat Sep 5 18:09:31 2015 -0700
     There's only two factors. Don't let your calculator lie.
 </code></pre>
 	
-Okay, so this number is corrupted - should have only two factors.
+Okay, so this number is possibly corrupted - seems like it should have only two factors.
 I wrote a python script to flip a bit in the string "270031727027", check if it was a number and had two prime factors, and print the results. Hopefully there's only one!
 
 <pre><code>
@@ -140,19 +154,27 @@ $ git hash-object sharp.cpp
 42a825de0209c287c039b52370ac690a40d838c1
 </code></pre>
 
-Number two on the list (272031727027) does the job!
+Number two on the list (272031727027) does the job! Two down :D
 
 <pre><code>
 $ git hash-object sharp.cpp
 d961f81a588fcfd5e57bbea7e17ddae8a5e61333
 </code></pre>
 
+^^ Checking that our modified file matches the hash specified by fsck.
+
 Last one.
 
 <pre><code>
 $ git cat-file -p f8d0839dd728cb9a723e32058dcc386070d5e3b5
 </code></pre>
-sharp.cpp again
+sharp.cpp again, this time it's on the latest commit (master)
+
+<pre><code>
+git checkout master --force
+</code></pre>
+
+There's a lot here. We can see just the bits which have changed between commits with 'git diff old new'. Additions are marked with a +, subtractions with a -... yeah...
 
 <pre><code>
 $ git diff d57a master
